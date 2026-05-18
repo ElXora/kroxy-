@@ -69,10 +69,10 @@
 ssh root@YOUR_VPS_IP
 
 # 2. Clone the repo
-git clone https://github.com/YOUR_USERNAME/kryoxi-panel.git kryoxi-panel
+git clone https://github.com/ElXora/kroxy-.git
 
 # 3. Enter the folder
-cd kryoxi-panel
+cd kroxy-
 
 # 4. Make installer executable
 chmod +x install.sh
@@ -95,8 +95,8 @@ The installer automatically handles:
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/kryoxi-panel.git
-cd kryoxi-panel
+git clone https://github.com/ElXora/kroxy-.git
+cd kroxy-
 
 # Install dependencies
 npm install
