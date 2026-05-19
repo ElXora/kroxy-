@@ -69,8 +69,7 @@
 ssh root@YOUR_VPS_IP
 
 # 2. Clone the repo
-git clone https://github.com/YOUR_USERNAME/kroxy-panel.git kroxy-panel
-
+git clone https://github.com/ElXora/kroxy-panel.git
 # 3. Enter the folder
 cd kroxy-panel
 
@@ -95,7 +94,7 @@ The installer automatically handles:
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/kroxy-panel.git
+git clone https://github.com/ElXora/kroxy-panel.git
 cd kroxy-panel
 
 # Install dependencies
