@@ -23,7 +23,9 @@ function formatSize(bytes) {
 // ===== SERVER STATS =====
 router.get('/servers/:id/stats', async (req, res) => {
   const server = await db.servers.findOne({ _id: req.params.id, userId: res.locals.user._id });
-  if (!server || !server.containerId) return res.json({ cpu:0, mem:0, memLimit:0, memPct:0, status: server?.status||'unknown' });
+  if (!server) return res.json({ cpu:0, mem:0, memLimit:0, memPct:0, status: 'unknown' });
+  // If no container yet, return DB status (covers 'installing')
+  if (!server.containerId) return res.json({ cpu:0, mem:0, memLimit:0, memPct:0, status: server.status || 'installing' });
   const [stats, status] = await Promise.all([
     docker.getStats(server.containerId).catch(() => ({ cpu:0, mem:0, memLimit:0, memPct:0 })),
     docker.getStatus(server.containerId).catch(() => 'unknown'),

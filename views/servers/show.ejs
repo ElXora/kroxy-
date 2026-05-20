@@ -25,6 +25,18 @@
     </div>
   </div>
 
+  <!-- Installing Banner (shown when container is being created) -->
+  <% if (server.status === 'installing') { %>
+  <div class="installing-banner" id="installingBanner">
+    <div class="install-spinner"></div>
+    <div>
+      <div style="font-weight:700;margin-bottom:3px">CONTAINER BEING CREATED</div>
+      <div style="color:rgba(250,204,21,.7);font-size:10px">Pulling Docker image & setting up server... This may take 1–3 minutes.</div>
+    </div>
+    <div class="install-bar"><div class="install-bar-fill"></div></div>
+  </div>
+  <% } %>
+
   <!-- Control buttons -->
   <div class="server-controls">
     <button class="btn btn-success" id="btnStart" onclick="serverAction('start')" <%= server.status==='running'?'disabled':'' %>>
@@ -100,6 +112,7 @@
       <div class="panel-header">
         <h2 class="panel-title">CONSOLE</h2>
         <div style="display:flex;gap:10px;align-items:center">
+          <span class="lps-badge" id="lpsBadge">0 LPS</span>
           <span class="ws-status" id="wsStatus">● CONNECTING...</span>
           <button class="btn btn-sm btn-ghost" onclick="clearConsole()">CLEAR</button>
         </div>
@@ -406,6 +419,7 @@ function updateWsStatus(text, ok) {
 function appendLog(text) {
   if (firstLog) { consoleOut.innerHTML = ''; firstLog = false; }
   const lines = text.split('\n');
+  _lpsCount += lines.filter(l => l.trim()).length;
   lines.forEach(line => {
     if (!line && lines[lines.length-1] === line) return;
     const el = document.createElement('div');
@@ -442,20 +456,39 @@ async function serverAction(action) {
 }
 
 // ===== STATS POLLING =====
+let _lpsLines = 0, _lpsCount = 0;
+setInterval(() => {
+  const badge = document.getElementById('lpsBadge');
+  if (badge) {
+    badge.textContent = _lpsCount + ' LPS';
+    badge.className = 'lps-badge' + (_lpsCount > 0 ? ' lps-active' : '');
+    _lpsCount = 0;
+  }
+}, 1000);
+
 async function pollStats() {
   try {
     const res  = await fetch(`/api/servers/${SERVER_ID}/stats`);
     const s    = await res.json();
+    const currentStatus = s.status || 'unknown';
+
+    // If was installing and now has a container, reload to update UI
+    const banner = document.getElementById('installingBanner');
+    if (banner && currentStatus !== 'installing') {
+      location.reload(); return;
+    }
+    // If still installing, keep polling fast
+    if (currentStatus === 'installing') return;
+
     document.getElementById('statCpu').textContent = s.cpu + '%';
     document.getElementById('statMem').textContent = s.mem + 'MB / ' + s.memLimit + 'MB';
-    document.getElementById('statStatus').textContent = (s.status||'unknown').toUpperCase();
+    document.getElementById('statStatus').textContent = currentStatus.toUpperCase();
     document.getElementById('cpuBar').style.width  = Math.min(s.cpu, 100) + '%';
     document.getElementById('memBar').style.width  = s.memPct + '%';
     const pill = document.getElementById('statusPill');
-    if (pill) pill.className = 'status-pill status-' + s.status;
-    document.getElementById('statusText').textContent = (s.status||'unknown').toUpperCase();
-    document.getElementById('statusDot').className = 'status-dot-lg status-' + (s.status==='running'?'running':'offline');
-    document.getElementById('statStatus').textContent = (s.status||'unknown').toUpperCase();
+    if (pill) pill.className = 'status-pill status-' + currentStatus;
+    document.getElementById('statusText').textContent = currentStatus.toUpperCase();
+    document.getElementById('statusDot').className = 'status-dot-lg status-' + (currentStatus === 'running' ? 'running' : 'offline');
   } catch(e) {}
 }
 
@@ -754,5 +787,6 @@ async function addSubUser() {
 // Init
 connectWs();
 pollStats();
-setInterval(pollStats, 4000);
+// Poll every 2s — when installing, this catches the moment containerId is set and reloads
+setInterval(pollStats, 2000);
 </script>

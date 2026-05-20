@@ -345,6 +345,116 @@ body:not(.auth-body) {
 .status-pill.status-running { border-color: var(--green); color: var(--green); }
 .status-pill.status-offline { border-color: var(--border2); color: var(--muted); }
 .status-pill.status-error { border-color: var(--red); color: var(--red); }
+.status-pill.status-installing { border-color: var(--yellow); color: var(--yellow); animation: blink 1.2s infinite; }
+
+/* ===== PAGE LOADING OVERLAY ===== */
+#pageLoadOverlay {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  opacity: 1;
+  transition: opacity .4s ease;
+  pointer-events: none;
+}
+#pageLoadOverlay.fade-out { opacity: 0; }
+.plo-logo {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--white);
+}
+.plo-logo .bracket { color: var(--muted); }
+.plo-bar {
+  width: 200px;
+  height: 2px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.plo-bar-fill {
+  position: absolute;
+  top: 0; left: -40%;
+  width: 40%;
+  height: 100%;
+  background: var(--white);
+  border-radius: 2px;
+  animation: ploSlide 1s ease-in-out infinite;
+}
+@keyframes ploSlide {
+  0%   { left: -40%; }
+  100% { left: 100%; }
+}
+.plo-text {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* ===== INSTALLING BANNER ===== */
+.installing-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(250,204,21,.07);
+  border: 1px solid rgba(250,204,21,.25);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  margin-bottom: 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--yellow);
+  letter-spacing: .5px;
+}
+.installing-banner .install-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(250,204,21,.2);
+  border-top-color: var(--yellow);
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: spin .8s linear infinite;
+}
+.installing-banner .install-bar {
+  flex: 1;
+  height: 3px;
+  background: rgba(250,204,21,.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.installing-banner .install-bar-fill {
+  height: 100%;
+  background: var(--yellow);
+  border-radius: 2px;
+  animation: installProgress 8s ease-in-out forwards;
+  animation-iteration-count: infinite;
+}
+@keyframes installProgress {
+  0%   { width: 0%; }
+  80%  { width: 85%; }
+  100% { width: 85%; }
+}
+
+/* ===== LPS COUNTER ===== */
+.lps-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  padding: 2px 8px;
+  background: var(--bg3);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  transition: color .3s;
+}
+.lps-badge.lps-active { color: var(--green); border-color: rgba(74,222,128,.3); }
 
 /* ===== BADGES ===== */
 .badge {
